@@ -17,13 +17,15 @@ if __name__ == '__main__':
         [[sg.Text('Video Title1', font=12, pad=(5, 0))], [sg.Text('ChannelName', pad=(5, 0))],
          [sg.Text('4:02', pad=(5, 0))]])]
 
+    # queued_video_entry.append(video_entry_def)
+    # queued_video_entry.append(video_entry_def1)
 
     queue_tab_layout = [
         [sg.Text('Search:'), sg.In(key='-QUEUE_SEARCH_INPUT-', enable_events=True)],
-        [sg.Frame('', [[sg.Column(queued_video_entry, key='-QUEUE_VIDEO_COLUMN-', scrollable=True, vertical_scroll_only=True,
-                                  element_justification='C', size=(800, 500), background_color='#335267', pad=(0, 0))]],
+        [sg.Frame('', [
+            [sg.Column(queued_video_entry, key='-QUEUE_VIDEO_COLUMN-', scrollable=True, vertical_scroll_only=True,
+                       size=(800, 500), background_color='#335267', pad=(0, 0))]],
                   pad=(5, 0))],
-        # [sg.Column([[sg.Frame('', [video_entry_def])]], scrollable=True, vertical_scroll_only=True, element_justification='center', size=(800, 500))],
         [sg.Text('Youtube URL:', pad=((5, 0), 3)), sg.Input(key='-SEARCHINPUT-', size=(35, 1), pad=(0, 3)),
          sg.Button(button_text='Add', key='-YT_URL_ADD-', bind_return_key=True, pad=((5, 20), 0)),
          sg.Text('Save to:', pad=((5, 0), 3)), sg.Input(size=(35, 1), key='-FOLDER-', pad=(0, 3)),
@@ -57,15 +59,13 @@ if __name__ == '__main__':
         print(event, values)
         if event == sg.WIN_CLOSED:
             break
-        if event ==  '-YT_URL_ADD-':
+        if event == '-YT_URL_ADD-':
             # test_functions.add_video(queued_video_entry)
             # queued_video_entry.append(video_entry_def)
             # print(queued_video_entry)
             # window.refresh()
             window['-QUEUE_VIDEO_COLUMN-'].update(visible=False)
-            queued_video_entry.append(video_entry_def)
+            # queued_video_entry.append(video_entry_def)
             window['-QUEUE_VIDEO_COLUMN-'].update(visible=True)
-
-
 
     window.close()
