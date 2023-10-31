@@ -8,7 +8,7 @@ if __name__ == '__main__':
         ['Options', ['Command3']]
     ]
 
-    queued_video_entry = []
+    queued_video_entries = []
 
     video_entry_def = [sg.Image('test_thumbnail.png', size=(128, 72)), sg.Column(
         [[sg.Text('Video Title', font=12, pad=(5, 0))], [sg.Text('Channel', pad=(5, 0))],
@@ -23,9 +23,17 @@ if __name__ == '__main__':
     queue_tab_layout = [
         [sg.Text('Search:'), sg.In(key='-QUEUE_SEARCH_INPUT-', enable_events=True)],
         [sg.Frame('', [
-            [sg.Column(queued_video_entry, key='-QUEUE_VIDEO_COLUMN-', scrollable=True, vertical_scroll_only=True,
-                       size=(800, 500), background_color='#335267', pad=(0, 0))]],
-                  pad=(5, 0))],
+            # [sg.Column(queued_video_entry, key='-QUEUE_VIDEO_COLUMN-', scrollable=True, vertical_scroll_only=True,
+            #            size=(800, 500), background_color='#335267', pad=(0, 0))]
+
+            # [sg.Listbox(queued_video_entries, key='-QUEUED_VIDEOS-', size=(25, 25), pad=(0, 0))]], pad=(5, 0)),
+            [sg.Listbox(queued_video_entries, size=(30, 40)),
+             sg.Column([
+                 [sg.Image('test_thumbnail.png', size=(640, 360))],
+                 [sg.Button(button_text='Play'), sg.Button(button_text='Delete')]
+             ], element_justification='c')]
+
+        ], pad=(5, 0))],
         [sg.Text('Youtube URL:', pad=((5, 0), 3)), sg.Input(key='-SEARCHINPUT-', size=(35, 1), pad=(0, 3)),
          sg.Button(button_text='Add', key='-YT_URL_ADD-', bind_return_key=True, pad=((5, 20), 0)),
          sg.Text('Save to:', pad=((5, 0), 3)), sg.Input(size=(35, 1), key='-FOLDER-', pad=(0, 3)),
