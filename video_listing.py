@@ -12,5 +12,5 @@ class VideoListing:
         self.downloaded = downloaded
 
     def __str__(self):
-        return self.title
+        return self.url_link
 
