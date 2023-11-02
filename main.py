@@ -24,23 +24,22 @@ if __name__ == '__main__':
     queue_tab_layout = [
         [sg.Text('Search:'), sg.In(key='-QUEUE_SEARCH_INPUT-', enable_events=True)],
         [sg.Frame('', [
-            # [sg.Column(queued_video_entry, key='-QUEUE_VIDEO_COLUMN-', scrollable=True, vertical_scroll_only=True,
-            #            size=(800, 500), background_color='#335267', pad=(0, 0))]
 
             # [sg.Listbox(queued_video_entries, key='-QUEUED_VIDEOS-', size=(25, 25), pad=(0, 0))]], pad=(5, 0)),
             [sg.Listbox(queued_video_entries, size=(30, 30), key='-QUEUE_LISTBOX-'),
              sg.Column([
-                 [sg.Image('test_thumbnail.png', key='-THUMBNAIL_IMAGE', size=(640, 360))],
-                 [sg.Button(button_text='Play'), sg.Button(button_text='Delete')]
+                 [sg.Frame('', [[sg.Image('', key='-THUMBNAIL_IMAGE', size=(640, 360), pad=(0, 0))]], pad=(5, 5))],
+                 [sg.Button(button_text='Download'), sg.Button(button_text='Delete')]
              ], element_justification='c')]
 
         ], pad=(5, 0))],
         [sg.Text('Youtube URL:', pad=((5, 0), 3)),
-         sg.Input(key='-SEARCHINPUT-', size=(35, 1), pad=(0, 3), do_not_clear=False),
+         sg.Input(key='-URL_INPUT-', size=(35, 1), pad=(0, 3), do_not_clear=False),
          sg.Button(button_text='Add', key='-YT_URL_ADD-', bind_return_key=True, pad=((5, 20), 0)),
          sg.Text('Save to:', pad=((5, 0), 3)), sg.Input(size=(35, 1), key='-FOLDER-', pad=(0, 3)),
          sg.FolderBrowse('Browse')],
-        [sg.Text('', size=(30, 1), key='-RESPONSE_TO_URL_INPUT-'), sg.Checkbox(text='test', pad=((5,380),3)), sg.Button(button_text='Download')]
+        [sg.Text('', size=(35, 1), key='-RESPONSE_TO_URL_INPUT-'),
+         sg.Checkbox(text='test', pad=((5,380),3)), sg.Button(button_text='Download All', key='-DOWNLOAD_ALL-')]
     ]
 
     downloaded_video_entries = []
@@ -74,8 +73,8 @@ if __name__ == '__main__':
         print(event, values)
         if event == sg.WIN_CLOSED:
             break
-        if event == '-YT_URL_ADD-' and values['-SEARCHINPUT-'] != '':
-            url_input = values['-SEARCHINPUT-']
+        if event == '-YT_URL_ADD-' and values['-URL_INPUT-'] != '':
+            url_input = values['-URL_INPUT-']
             base_youtube_url = 'www.youtube.com/watch?v='
             if base_youtube_url in url_input:
                 #url valid, youtube api to get info
@@ -97,6 +96,7 @@ if __name__ == '__main__':
 
     window.close()
 
+    #already in running while loop
     def is_valid_url(url):
         base_youtube_url = 'www.youtube.com/watch?v='
         return base_youtube_url in url
