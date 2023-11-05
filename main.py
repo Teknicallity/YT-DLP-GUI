@@ -25,7 +25,7 @@ if __name__ == '__main__':
         [sg.Frame('', [
 
             # [sg.Listbox(queued_video_entries, key='-QUEUED_VIDEOS-', size=(25, 25), pad=(0, 0))]], pad=(5, 0)),
-            [sg.Listbox(queued_video_entries, size=(30, 30), key='-QUEUE_LISTBOX-'),
+            [sg.Listbox(queued_video_entries, size=(30, 30), key='-QUEUE_LISTBOX-', select_mode=sg.LISTBOX_SELECT_MODE_SINGLE, enable_events=True),
              sg.Column([
                  [sg.Frame('', [[sg.Image('', key='-THUMBNAIL_IMAGE', size=(640, 360), pad=(0, 0))]], pad=(5, 5))],
                  [sg.Button(button_text='Download'), sg.Button(button_text='Delete')]
@@ -73,6 +73,7 @@ if __name__ == '__main__':
         print(event, values)
         if event == sg.WIN_CLOSED:
             break
+
         if event == '-YT_URL_ADD-' and values['-URL_INPUT-'] != '':
             url_input = values['-URL_INPUT-']
             base_youtube_url = 'www.youtube.com/watch?v='
@@ -88,12 +89,21 @@ if __name__ == '__main__':
             else:
                 window['-RESPONSE_TO_URL_INPUT-'].update('Please provide a valid youtube video URL!')
 
+        #listbox selection
+        elif event == '-QUEUE_LISTBOX-':
+            selection = values['-QUEUE_LISTBOX-']
+            print(selection) #video object
+            if selection:
+                entry = selection[0]
+                print(f'this: {entry}') #video object to string
+
+
         #tests. remove
-        if event == 'test1':
+        elif event == 'test1':
             window['-URL_INPUT-'].update('https://www.youtube.com/watch?v=UAdwUWhfZmM')
-        if event == 'test2':
+        elif event == 'test2':
             window['-URL_INPUT-'].update('https://www.youtube.com/watch?v=SP1XDSBU4qk')
-        if event == 'test3':
+        elif event == 'test3':
             window['-URL_INPUT-'].update('https://www.youtube.com/watch?v=AXcSyPETFBw')
 
 
