@@ -1,5 +1,4 @@
 import PySimpleGUI as sg
-import test_functions
 from video_listing import VideoListing
 
 if __name__ == '__main__':
@@ -39,7 +38,8 @@ if __name__ == '__main__':
          sg.Text('Save to:', pad=((5, 0), 3)), sg.Input(size=(35, 1), key='-FOLDER-', pad=(0, 3)),
          sg.FolderBrowse('Browse')],
         [sg.Text('', size=(35, 1), key='-RESPONSE_TO_URL_INPUT-'),
-         sg.Checkbox(text='test', pad=((5,380),3)), sg.Button(button_text='Download All', key='-DOWNLOAD_ALL-')]
+         sg.Checkbox(text='test', pad=((5,300),3)), sg.Button(button_text='Download All', key='-DOWNLOAD_ALL-')],
+        [sg.Button(button_text='test1'), sg.Button(button_text='test2'), sg.Button(button_text='test3')] # remove tests
     ]
 
     downloaded_video_entries = []
@@ -88,9 +88,22 @@ if __name__ == '__main__':
             else:
                 window['-RESPONSE_TO_URL_INPUT-'].update('Please provide a valid youtube video URL!')
 
+        #tests. remove
+        if event == 'test1':
+            window['-URL_INPUT-'].update('https://www.youtube.com/watch?v=UAdwUWhfZmM')
+        if event == 'test2':
+            window['-URL_INPUT-'].update('https://www.youtube.com/watch?v=SP1XDSBU4qk')
+        if event == 'test3':
+            window['-URL_INPUT-'].update('https://www.youtube.com/watch?v=AXcSyPETFBw')
+
 
         if values['-QUEUE_SEARCH_INPUT-'] != '':
-            search_query = values['-QUEUE_SEARCH_INPUT-']
+            search_query = values['-QUEUE_SEARCH_INPUT-'].lower()
+            # search_query = search_query.lower()
+            search_response = [entry for entry in queued_video_entries if search_query in entry.lower()]
+            window['-QUEUE_LISTBOX-'].update(search_response)
+        else:
+            window['-QUEUE_LISTBOX-'].update(queued_video_entries)
 
             #window[]
 
