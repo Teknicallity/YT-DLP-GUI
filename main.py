@@ -25,7 +25,8 @@ if __name__ == '__main__':
         [sg.Frame('', [
 
             # [sg.Listbox(queued_video_entries, key='-QUEUED_VIDEOS-', size=(25, 25), pad=(0, 0))]], pad=(5, 0)),
-            [sg.Listbox(queued_video_entries, size=(30, 30), key='-QUEUE_LISTBOX-', select_mode=sg.LISTBOX_SELECT_MODE_SINGLE, enable_events=True),
+            [sg.Listbox(queued_video_entries, size=(30, 30), key='-QUEUE_LISTBOX-',
+                        select_mode=sg.LISTBOX_SELECT_MODE_SINGLE, enable_events=True),
              sg.Column([
                  [sg.Frame('', [[sg.Image('', key='-THUMBNAIL_IMAGE', size=(640, 360), pad=(0, 0))]], pad=(5, 5))],
                  [sg.Button(button_text='Download'), sg.Button(button_text='Delete')]
@@ -38,8 +39,8 @@ if __name__ == '__main__':
          sg.Text('Save to:', pad=((5, 0), 3)), sg.Input(size=(35, 1), key='-FOLDER-', pad=(0, 3)),
          sg.FolderBrowse('Browse')],
         [sg.Text('', size=(35, 1), key='-RESPONSE_TO_URL_INPUT-'),
-         sg.Checkbox(text='test', pad=((5,300),3)), sg.Button(button_text='Download All', key='-DOWNLOAD_ALL-')],
-        [sg.Button(button_text='test1'), sg.Button(button_text='test2'), sg.Button(button_text='test3')] # remove tests
+         sg.Checkbox(text='test', pad=((5, 300), 3)), sg.Button(button_text='Download All', key='-DOWNLOAD_ALL-')],
+        [sg.Button(button_text='test1'), sg.Button(button_text='test2'), sg.Button(button_text='test3')]  # remove tests
     ]
 
     downloaded_video_entries = []
@@ -49,7 +50,8 @@ if __name__ == '__main__':
         [sg.Frame('', [
             [sg.Listbox(downloaded_video_entries, size=(30, 30), key='-DOWNLOAD_LISTBOX-'),
              sg.Column([
-                 [sg.Frame('', [[sg.Image('test_thumbnail.png', key='-THUMBNAIL_IMAGE', size=(640, 360), pad=(0, 0))]], pad=(5, 5))],
+                 [sg.Frame('', [[sg.Image('test_thumbnail.png', key='-THUMBNAIL_IMAGE', size=(640, 360), pad=(0, 0))]],
+                           pad=(5, 5))],
                  [sg.Button(button_text='Play'), sg.Button(button_text='Delete')]
              ], element_justification='c')]
 
@@ -75,12 +77,13 @@ if __name__ == '__main__':
             break
 
         if event == '-YT_URL_ADD-' and values['-URL_INPUT-'] != '':
-            url_input = values['-URL_INPUT-']
+            url_input: str = values['-URL_INPUT-']
             base_youtube_url = 'www.youtube.com/watch?v='
             if base_youtube_url in url_input:
-                #url valid, youtube api to get info
+                # url valid, youtube api to get info
                 # video_entry = VideoListing(url_input)
-                queued_video_entries.append(VideoListing(url_input))
+                video_id = url_input.split('v=')[1]
+                queued_video_entries.append(VideoListing(video_id))
                 window['-RESPONSE_TO_URL_INPUT-'].update('Added video to queue')
                 print(queued_video_entries)
 
@@ -89,16 +92,16 @@ if __name__ == '__main__':
             else:
                 window['-RESPONSE_TO_URL_INPUT-'].update('Please provide a valid youtube video URL!')
 
-        #listbox selection
+        # listbox selection
         elif event == '-QUEUE_LISTBOX-':
             selection = values['-QUEUE_LISTBOX-']
-            print(selection) #video object
+            print(selection)  # video object
             if selection:
                 entry = selection[0]
-                print(f'this: {entry}') #video object to string
+                print(f'this: {entry}')  # video object to string
 
 
-        #tests. remove
+        # tests. remove
         elif event == 'test1':
             window['-URL_INPUT-'].update('https://www.youtube.com/watch?v=UAdwUWhfZmM')
         elif event == 'test2':
@@ -106,7 +109,7 @@ if __name__ == '__main__':
         elif event == 'test3':
             window['-URL_INPUT-'].update('https://www.youtube.com/watch?v=AXcSyPETFBw')
 
-
+        # https://github.com/PySimpleGUI/PySimpleGUI/blob/master/DemoPrograms/Demo_Listbox_Search_Filter.py
         if values['-QUEUE_SEARCH_INPUT-'] != '':
             search_query = values['-QUEUE_SEARCH_INPUT-'].lower()
             # search_query = search_query.lower()
@@ -115,11 +118,12 @@ if __name__ == '__main__':
         else:
             window['-QUEUE_LISTBOX-'].update(queued_video_entries)
 
-            #window[]
+            # window[]
 
     window.close()
 
-    #already in running while loop
+
+    # already in running while loop
     def is_valid_url(url):
         base_youtube_url = 'www.youtube.com/watch?v='
         return base_youtube_url in url
