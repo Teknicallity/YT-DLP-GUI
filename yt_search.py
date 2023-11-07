@@ -16,14 +16,18 @@ search_response = youtube.search().list(
 '''
 
 
-def get_video_info_from_id(video_id):
+def get_video_info_from_id(video_id) -> dict:
+    """
+
+    :param video_id: end of the full youtube url
+    :return: dictionary of the video info
+    """
     youtube = build(YOUTUBE_API_SERVICE_NAME, YOUTUBE_API_VERSION, developerKey=DEVELOPER_KEY)
 
     video_response = youtube.videos().list(id=video_id, part='snippet').execute()
 
     if 'items' in video_response:
         video_info = video_response['items'][0]['snippet']  # returns dictionary
-        video_title = video_info['title']
-        return video_title
+        return video_info
     else:
         return None

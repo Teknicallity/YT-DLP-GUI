@@ -78,16 +78,15 @@ if __name__ == '__main__':
 
         if event == '-YT_URL_ADD-' and values['-URL_INPUT-'] != '':
             url_input: str = values['-URL_INPUT-']
-            base_youtube_url = 'www.youtube.com/watch?v='
+            base_youtube_url = 'youtube.com/watch?v='
             if base_youtube_url in url_input:
                 # url valid, youtube api to get info
                 # video_entry = VideoListing(url_input)
                 video_id = url_input.split('v=')[1]
                 queued_video_entries.append(VideoListing(video_id))
-                window['-RESPONSE_TO_URL_INPUT-'].update('Added video to queue')
                 print(queued_video_entries)
-
                 window['-QUEUE_LISTBOX-'].update(queued_video_entries)
+                window['-RESPONSE_TO_URL_INPUT-'].update('Added video to queue')
 
             else:
                 window['-RESPONSE_TO_URL_INPUT-'].update('Please provide a valid youtube video URL!')
