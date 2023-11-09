@@ -21,7 +21,7 @@ class VideoListing:
         self.thumbnail_path = None
         self.thumbnail_data = None
         self.video_name = None
-        self.downloaded = downloaded
+        self.is_downloaded = downloaded
         self.info = yt_search.get_video_info_from_id(id)
 
         self.fill_info()
@@ -89,4 +89,4 @@ class VideoListing:
 
     def download(self):
         yt_download.download_video_listing(self)
-        self.downloaded = True
+        self.is_downloaded = True

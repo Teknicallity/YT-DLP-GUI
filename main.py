@@ -108,7 +108,15 @@ if __name__ == '__main__':
             downloaded_video_entries.append(entry)
             queued_video_entries.remove(entry)
             window['-QUEUE_THUMBNAIL_IMAGE-'].update('', size=(640, 360))
-            yt_download.download_video_listing(entry)
+            entry.download()
+
+        elif event == '-DOWNLOAD_ALL-' and queued_video_entries:
+            print('Starting Download All')
+            for video in queued_video_entries:
+                downloaded_video_entries.append(video)
+                window['-QUEUE_THUMBNAIL_IMAGE-'].update('', size=(640, 360))
+                queued_video_entries.remove(video)
+                video.download()
 
         # download listbox selection
         elif event == '-DOWNLOAD_LISTBOX-':
