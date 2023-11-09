@@ -3,8 +3,12 @@ import os
 from PIL import Image
 import cloudscraper
 
+import yt_download
 import yt_search
 
+
+# replace the youtube api with ytdlp
+# https://github.com/yt-dlp/yt-dlp#extracting-information
 
 class VideoListing:
 
@@ -82,3 +86,7 @@ class VideoListing:
         png_bio = io.BytesIO()
         pil_image.save(png_bio, format="PNG")
         return png_bio.getvalue()
+
+    def download(self):
+        yt_download.download_video_listing(self)
+        self.downloaded = True

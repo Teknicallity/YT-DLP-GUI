@@ -1,5 +1,6 @@
 import PySimpleGUI as sg
 from video_listing import VideoListing
+import yt_download
 
 if __name__ == '__main__':
 
@@ -9,17 +10,6 @@ if __name__ == '__main__':
     ]
 
     queued_video_entries = []
-
-    video_entry_def = [sg.Image('test_thumbnail.png', size=(128, 72)), sg.Column(
-        [[sg.Text('Video Title', font=12, pad=(5, 0))], [sg.Text('Channel', pad=(5, 0))],
-         [sg.Text('10:01', pad=(5, 0))]])]
-    video_entry_def1 = [sg.Image('test_thumbnail.png', size=(128, 72)), sg.Column(
-        [[sg.Text('Video Title1', font=12, pad=(5, 0))], [sg.Text('ChannelName', pad=(5, 0))],
-         [sg.Text('4:02', pad=(5, 0))]])]
-
-    # queued_video_entry.append(video_entry_def)
-    # queued_video_entry.append(video_entry_def1)
-    xyz = ''
 
     queue_tab_layout = [
         [sg.Text('Search:'), sg.In(key='-QUEUE_SEARCH_INPUT-', enable_events=True)],
@@ -32,7 +22,8 @@ if __name__ == '__main__':
                  [sg.Frame('', [
                      [sg.Image('', key='-QUEUE_THUMBNAIL_IMAGE-', size=(640, 360), expand_x=False, expand_y=False,
                                pad=(0, 0))]], pad=(5, 5))],
-                 [sg.Button(button_text='Download', key='-DOWNLOAD-'), sg.Button(button_text='Delete', key='-DELETE-')]
+                 [sg.Button(button_text='Download', key='-DOWNLOAD-'),
+                  sg.Button(button_text='Delete', key='-QUEUE_DELETE-')]
              ], element_justification='c')]
 
         ], pad=(5, 0))],
@@ -51,11 +42,13 @@ if __name__ == '__main__':
     downloaded_tab_layout = [
         [sg.Text('Search:'), sg.In(key='-DOWNLOAD_SEARCH_INPUT-', enable_events=True)],
         [sg.Frame('', [
-            [sg.Listbox(downloaded_video_entries, size=(30, 30), key='-DOWNLOAD_LISTBOX-'),
+            [sg.Listbox(downloaded_video_entries, size=(30, 30), key='-DOWNLOAD_LISTBOX-',
+                        select_mode=sg.LISTBOX_SELECT_MODE_SINGLE, enable_events=True),
              sg.Column([
-                 [sg.Frame('', [[sg.Image('test_thumbnail.png', key='-THUMBNAIL_IMAGE', size=(640, 360), pad=(0, 0))]],
+                 [sg.Frame('',
+                           [[sg.Image('', key='-DOWNLOAD_THUMBNAIL_IMAGE-', size=(640, 360), pad=(0, 0))]],
                            pad=(5, 5))],
-                 [sg.Button(button_text='Play'), sg.Button(button_text='Delete')]
+                 [sg.Button(button_text='Play'), sg.Button(button_text='Delete', key='-DOWNLOAD_DELETE-')]
              ], element_justification='c')]
 
         ], pad=(5, 0))],
@@ -72,7 +65,9 @@ if __name__ == '__main__':
     ]
 
     window = sg.Window('Title', main_layout, size=(800, 800))
-    is_something_selected = False
+
+    is_something_queued_selected = False
+    is_something_downloaded_selected = False
 
     while True:
         event, values = window.read()
@@ -95,21 +90,39 @@ if __name__ == '__main__':
             else:
                 window['-RESPONSE_TO_URL_INPUT-'].update('Please provide a valid youtube video URL!')
 
-        # listbox selection
+        # queue listbox selection
         elif event == '-QUEUE_LISTBOX-':
             selection = values['-QUEUE_LISTBOX-']
             # print(selection)  # video object
             if selection:  # makes sure the selection is not empty
-                is_something_selected = True
+                is_something_queued_selected = True
                 entry: VideoListing = selection[0]
                 # print(f'this: {entry}')  # video object to string
                 window['-QUEUE_THUMBNAIL_IMAGE-'].update(entry.thumbnail_data)
 
-        elif event == '-DELETE-' and queued_video_entries and is_something_selected:
+        elif event == '-QUEUE_DELETE-' and queued_video_entries and is_something_queued_selected:
             queued_video_entries.remove(entry)
             window['-QUEUE_THUMBNAIL_IMAGE-'].update('', size=(640, 360))
 
-        # elif event == '-DOWNLOAD-' and queued_video_entries and is_something_selected:
+        elif event == '-DOWNLOAD-' and queued_video_entries and is_something_queued_selected:
+            downloaded_video_entries.append(entry)
+            queued_video_entries.remove(entry)
+            window['-QUEUE_THUMBNAIL_IMAGE-'].update('', size=(640, 360))
+            yt_download.download_video_listing(entry)
+
+        # download listbox selection
+        elif event == '-DOWNLOAD_LISTBOX-':
+            selection = values['-DOWNLOAD_LISTBOX-']
+            # print(selection)  # video object
+            if selection:  # makes sure the selection is not empty
+                is_something_downloaded_selected = True
+                entry: VideoListing = selection[0]
+                # print(f'this: {entry}')  # video object to string
+                window['-DOWNLOAD_THUMBNAIL_IMAGE-'].update(entry.thumbnail_data)
+
+        elif event == '-DOWNLOAD_DELETE-' and downloaded_video_entries and is_something_downloaded_selected:
+            downloaded_video_entries.remove(entry)
+            window['-DOWNLOAD_THUMBNAIL_IMAGE-'].update('', size=(640, 360))
 
 
         # tests. remove
@@ -122,19 +135,22 @@ if __name__ == '__main__':
 
         # https://github.com/PySimpleGUI/PySimpleGUI/blob/master/DemoPrograms/Demo_Listbox_Search_Filter.py
         if values['-QUEUE_SEARCH_INPUT-'] != '':
-            search_query = values['-QUEUE_SEARCH_INPUT-'].lower()
+            queued_search_query = values['-QUEUE_SEARCH_INPUT-'].lower()
             # search_query = search_query.lower()
-            search_response = [entry for entry in queued_video_entries if search_query in entry.lower()]
-            window['-QUEUE_LISTBOX-'].update(search_response)
+            queued_search_response = [entry for entry in queued_video_entries if queued_search_query in entry.lower()]
+            window['-QUEUE_LISTBOX-'].update(queued_search_response)
         else:
             window['-QUEUE_LISTBOX-'].update(queued_video_entries)
 
-            # window[]
+        if values['-DOWNLOAD_SEARCH_INPUT-'] != '':
+            downloaded_search_query = values['-DOWNLOAD_SEARCH_INPUT-'].lower()
+            # search_query = search_query.lower()
+            downloaded_search_response = [entry for entry in downloaded_video_entries if
+                                          downloaded_search_query in entry.lower()]
+            window['-DOWNLOAD_LISTBOX-'].update(downloaded_search_response)
+        else:
+            window['-DOWNLOAD_LISTBOX-'].update(downloaded_video_entries)
 
     window.close()
 
 
-    # already in running while loop
-    def is_valid_url(url):
-        base_youtube_url = 'www.youtube.com/watch?v='
-        return base_youtube_url in url
