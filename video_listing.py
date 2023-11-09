@@ -1,16 +1,22 @@
+import io
+import os
+from PIL import Image
+import cloudscraper
+
 import yt_search
 
 
 class VideoListing:
 
-    def __init__(self, id: str, title: str = None, channel: str = None, runtime: str = None,
-                 thumbnail_path: str = None, video_path: str = None, downloaded: bool = False):
+    def __init__(self, id: str, title: str = None, downloaded: bool = False):
+        self.thumbnail_url = None
         self.id = id
         self.title = title
-        self.channel = channel
-        self.runtime = runtime
-        self.thumbnail_path = thumbnail_path
-        self.video_name = video_path
+        self.channel = None
+        self.runtime = None
+        self.thumbnail_path = None
+        self.thumbnail_data = None
+        self.video_name = None
         self.downloaded = downloaded
         self.info = yt_search.get_video_info_from_id(id)
 
@@ -37,4 +43,42 @@ class VideoListing:
     def fill_info(self):
         self.title = self.info['title']
         self.channel = self.info['channelTitle']
-        self.thumbnail_url = self.info['thumbnails']['standard']
+        self.thumbnail_url = self.fill_thumbnail_url()
+
+        self.thumbnail_data = self.fill_thumbnail_data()
+
+    def fill_thumbnail_url(self):
+        """
+        tries to get the standard resolution url, or the next highest resolution
+        :return:
+        """
+        preferred_resolutions = ['standard', 'high', 'medium', 'default']
+        for resolution in preferred_resolutions:
+            if resolution in self.info['thumbnails']:
+                return self.info['thumbnails'][resolution]['url']
+
+    # def get_base64_from_png(self):
+    #     """
+    #     https://github.com/PySimpleGUI/PySimpleGUI/issues/6063#issuecomment-1328260218
+    #     :return: base64 encoded image
+    #     """
+    #     print(self.thumbnail_url)
+    #     return base64.b64encode(urllib.request.urlopen(self.thumbnail_url).read())
+
+    def fill_thumbnail_data(self):
+        """
+        https://stackoverflow.com/questions/69578469/pysimplegui-displaying-a-url-jpg
+        :return:
+        """
+        jpg_data = (
+            cloudscraper.create_scraper(
+                browser={"browser": "firefox", "platform": "windows", "mobile": False}
+            )
+            .get(self.thumbnail_url)
+            .content
+        )
+
+        pil_image = Image.open(io.BytesIO(jpg_data))
+        png_bio = io.BytesIO()
+        pil_image.save(png_bio, format="PNG")
+        return png_bio.getvalue()

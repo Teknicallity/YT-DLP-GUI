@@ -19,6 +19,7 @@ if __name__ == '__main__':
 
     # queued_video_entry.append(video_entry_def)
     # queued_video_entry.append(video_entry_def1)
+    xyz = ''
 
     queue_tab_layout = [
         [sg.Text('Search:'), sg.In(key='-QUEUE_SEARCH_INPUT-', enable_events=True)],
@@ -28,8 +29,10 @@ if __name__ == '__main__':
             [sg.Listbox(queued_video_entries, size=(30, 30), key='-QUEUE_LISTBOX-',
                         select_mode=sg.LISTBOX_SELECT_MODE_SINGLE, enable_events=True),
              sg.Column([
-                 [sg.Frame('', [[sg.Image('', key='-THUMBNAIL_IMAGE', size=(640, 360), pad=(0, 0))]], pad=(5, 5))],
-                 [sg.Button(button_text='Download'), sg.Button(button_text='Delete')]
+                 [sg.Frame('', [
+                     [sg.Image('', key='-QUEUE_THUMBNAIL_IMAGE-', size=(640, 360), expand_x=False, expand_y=False,
+                               pad=(0, 0))]], pad=(5, 5))],
+                 [sg.Button(button_text='Download', key='-DOWNLOAD-'), sg.Button(button_text='Delete', key='-DELETE-')]
              ], element_justification='c')]
 
         ], pad=(5, 0))],
@@ -69,6 +72,7 @@ if __name__ == '__main__':
     ]
 
     window = sg.Window('Title', main_layout, size=(800, 800))
+    is_something_selected = False
 
     while True:
         event, values = window.read()
@@ -94,10 +98,18 @@ if __name__ == '__main__':
         # listbox selection
         elif event == '-QUEUE_LISTBOX-':
             selection = values['-QUEUE_LISTBOX-']
-            print(selection)  # video object
-            if selection:
-                entry = selection[0]
-                print(f'this: {entry}')  # video object to string
+            # print(selection)  # video object
+            if selection:  # makes sure the selection is not empty
+                is_something_selected = True
+                entry: VideoListing = selection[0]
+                # print(f'this: {entry}')  # video object to string
+                window['-QUEUE_THUMBNAIL_IMAGE-'].update(entry.thumbnail_data)
+
+        elif event == '-DELETE-' and queued_video_entries and is_something_selected:
+            queued_video_entries.remove(entry)
+            window['-QUEUE_THUMBNAIL_IMAGE-'].update('', size=(640, 360))
+
+        # elif event == '-DOWNLOAD-' and queued_video_entries and is_something_selected:
 
 
         # tests. remove
