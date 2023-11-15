@@ -21,7 +21,8 @@ if __name__ == '__main__':
              sg.Column([
                  [sg.Frame('', [
                      [sg.Image('', key='-QUEUE_THUMBNAIL_IMAGE-', size=(640, 360), expand_x=False, expand_y=False,
-                               pad=(0, 0))]], pad=(5, 5))],
+                               pad=(0, 0))]
+                 ], pad=(5, 5), size=(640, 360))],
                  [sg.Button(button_text='Download', key='-DOWNLOAD-'),
                   sg.Button(button_text='Delete', key='-QUEUE_DELETE-')]
              ], element_justification='c')]
@@ -47,7 +48,7 @@ if __name__ == '__main__':
              sg.Column([
                  [sg.Frame('',
                            [[sg.Image('', key='-DOWNLOAD_THUMBNAIL_IMAGE-', size=(640, 360), pad=(0, 0))]],
-                           pad=(5, 5))],
+                           pad=(5, 5), size=(640, 360))],
                  [sg.Button(button_text='Play'), sg.Button(button_text='Delete', key='-DOWNLOAD_DELETE-')]
              ], element_justification='c')]
 
