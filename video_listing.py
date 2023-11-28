@@ -1,5 +1,6 @@
 import io
-import os
+import os.path
+from os import startfile
 from PIL import Image
 import cloudscraper
 
@@ -13,14 +14,14 @@ import yt_search
 class VideoListing:
 
     def __init__(self, id: str, title: str = None, downloaded: bool = False):
-        self.thumbnail_url = None
-        self.id = id
         self.title = title
+        self.id = id
         self.channel = None
-        self.runtime = None
-        self.thumbnail_path = None
+        self.thumbnail_url = None
         self.thumbnail_data = None
-        self.video_name = None
+        self.runtime = None
+        self.file_path = None
+        self.video_file_name = None
         self.is_downloaded = downloaded
         self.info = yt_search.get_video_info_from_id(id)
 
@@ -87,6 +88,13 @@ class VideoListing:
         pil_image.save(png_bio, format="PNG")
         return png_bio.getvalue()
 
-    def download(self):
-        yt_download.download_video_listing(self)
+    def download(self, download_folder: str):
+        self.file_path = download_folder
+        yt_download.download_video_listing(self, download_folder)
         self.is_downloaded = True
+        self.video_file_name = self.title + '.mp4'
+
+    def play_video(self):
+        path = os.path.join(self.file_path , self.video_file_name)
+        print("Download Path:", path)
+        startfile(path)
