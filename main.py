@@ -113,7 +113,8 @@ if __name__ == '__main__':
 
         elif event == '-DOWNLOAD_ALL-' and queued_video_entries:
             print('Starting Download All')
-            for video in queued_video_entries:
+            temp_queued_list = queued_video_entries.copy()
+            for video in temp_queued_list:
                 downloaded_video_entries.append(video)
                 window['-QUEUE_THUMBNAIL_IMAGE-'].update('', size=(640, 360))
                 queued_video_entries.remove(video)
