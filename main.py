@@ -14,8 +14,6 @@ if __name__ == '__main__':
     queue_tab_layout = [
         [sg.Text('Search:'), sg.In(key='-QUEUE_SEARCH_INPUT-', enable_events=True)],
         [sg.Frame('', [
-
-            # [sg.Listbox(queued_video_entries, key='-QUEUED_VIDEOS-', size=(25, 25), pad=(0, 0))]], pad=(5, 0)),
             [sg.Listbox(queued_video_entries, size=(30, 30), key='-QUEUE_LISTBOX-',
                         select_mode=sg.LISTBOX_SELECT_MODE_SINGLE, enable_events=True),
              sg.Column([
@@ -32,8 +30,8 @@ if __name__ == '__main__':
          sg.Button(button_text='Add', key='-YT_URL_ADD-', bind_return_key=True, pad=((5, 20), 0)),
          sg.Text('Save to:', pad=((5, 0), 3)), sg.Input(size=(35, 1), key='-FOLDER-', pad=(0, 3)),
          sg.FolderBrowse('Browse')],
-        [sg.Text('', size=(35, 1), key='-RESPONSE_TO_URL_INPUT-'),
-         sg.Checkbox(text='test', pad=((5, 300), 3)), sg.Button(button_text='Download All', key='-DOWNLOAD_ALL-')],
+        [sg.Text('', size=(35, 1), key='-RESPONSE_TO_URL_INPUT-'), sg.Push(),
+         sg.Button(button_text='Download All', key='-DOWNLOAD_ALL-')],
         [sg.Button(button_text='test1'), sg.Button(button_text='test2'), sg.Button(button_text='test3')]  # remove tests
     ]
 
@@ -60,7 +58,7 @@ if __name__ == '__main__':
     ]]
 
     main_layout = [
-        [sg.MenubarCustom(menubar_def, tearoff=False)],
+        # [sg.MenubarCustom(menubar_def, tearoff=False)],
         [sg.TabGroup(tab_group_layout)]
     ]
 
@@ -68,6 +66,9 @@ if __name__ == '__main__':
 
     is_something_queued_selected = False
     is_something_downloaded_selected = False
+
+    download_wait_message = "Downloading\nPlease Wait"
+    auto_close_time = 2
 
     while True:
         event, values = window.read()
@@ -107,16 +108,19 @@ if __name__ == '__main__':
         elif event == '-DOWNLOAD-' and queued_video_entries and is_something_queued_selected:
             downloaded_video_entries.append(entry)
             queued_video_entries.remove(entry)
+            sg.popup_timed(download_wait_message, auto_close_duration=auto_close_time, non_blocking=True)
             window['-QUEUE_THUMBNAIL_IMAGE-'].update('', size=(640, 360))
             entry.download()
 
         elif event == '-DOWNLOAD_ALL-' and queued_video_entries:
             print('Starting Download All')
+            sg.popup_timed(download_wait_message, auto_close_duration=auto_close_time*len(queued_video_entries), non_blocking=True)
             for video in queued_video_entries:
                 downloaded_video_entries.append(video)
                 window['-QUEUE_THUMBNAIL_IMAGE-'].update('', size=(640, 360))
                 queued_video_entries.remove(video)
                 video.download()
+            # close sg.popup
 
         # download listbox selection
         elif event == '-DOWNLOAD_LISTBOX-':
