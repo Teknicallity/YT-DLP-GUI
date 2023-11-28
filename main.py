@@ -14,12 +14,15 @@ if __name__ == '__main__':
     queue_tab_layout = [
         [sg.Text('Search:'), sg.In(key='-QUEUE_SEARCH_INPUT-', enable_events=True)],
         [sg.Frame('', [
+
+            # [sg.Listbox(queued_video_entries, key='-QUEUED_VIDEOS-', size=(25, 25), pad=(0, 0))]], pad=(5, 0)),
             [sg.Listbox(queued_video_entries, size=(30, 30), key='-QUEUE_LISTBOX-',
                         select_mode=sg.LISTBOX_SELECT_MODE_SINGLE, enable_events=True),
              sg.Column([
                  [sg.Frame('', [
                      [sg.Image('', key='-QUEUE_THUMBNAIL_IMAGE-', size=(640, 360), expand_x=False, expand_y=False,
-                               pad=(0, 0))]], pad=(5, 5))],
+                               pad=(0, 0))]
+                 ], pad=(5, 5), size=(640, 360))],
                  [sg.Button(button_text='Download', key='-DOWNLOAD-'),
                   sg.Button(button_text='Delete', key='-QUEUE_DELETE-')]
              ], element_justification='c')]
@@ -45,7 +48,7 @@ if __name__ == '__main__':
              sg.Column([
                  [sg.Frame('',
                            [[sg.Image('', key='-DOWNLOAD_THUMBNAIL_IMAGE-', size=(640, 360), pad=(0, 0))]],
-                           pad=(5, 5))],
+                           pad=(5, 5), size=(640, 360))],
                  [sg.Button(button_text='Play'), sg.Button(button_text='Delete', key='-DOWNLOAD_DELETE-')]
              ], element_justification='c')]
 
@@ -114,8 +117,9 @@ if __name__ == '__main__':
 
         elif event == '-DOWNLOAD_ALL-' and queued_video_entries:
             print('Starting Download All')
+            temp_queued_list = queued_video_entries.copy()
             sg.popup_timed(download_wait_message, auto_close_duration=auto_close_time*len(queued_video_entries), non_blocking=True)
-            for video in queued_video_entries:
+            for video in temp_queued_list:
                 downloaded_video_entries.append(video)
                 window['-QUEUE_THUMBNAIL_IMAGE-'].update('', size=(640, 360))
                 queued_video_entries.remove(video)
