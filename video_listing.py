@@ -1,6 +1,8 @@
 import io
-import os.path
-from os import startfile, remove
+import os
+import sys
+import subprocess
+
 from PIL import Image
 import cloudscraper
 
@@ -114,7 +116,11 @@ class VideoListing:
         path = os.path.normpath(raw_path)
         print("Download Path:", path)
         try:
-            os.startfile(path)
+            if sys.platform == "win32":
+                os.startfile(path)
+            else:
+                opener = "open" if sys.platform == "darwin" else "xdg-open"
+                subprocess.call([opener, path])
         except OSError as e:
             print(f"Error playing video: {e}")
 
