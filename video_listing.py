@@ -105,8 +105,9 @@ class VideoListing:
         """
         self.file_path = download_folder
         yt_download.download_video_listing(self, download_folder)
+        self.video_file_name = yt_download.get_video_file_name(self, download_folder)
         self.is_downloaded = True
-        self.video_file_name = self.title + '.mp4'
+        # self.video_file_name = self.title + '.mp4'
 
     def play_video(self):
         """
