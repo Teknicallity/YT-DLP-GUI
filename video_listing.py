@@ -3,6 +3,7 @@ import os
 import sys
 import subprocess
 
+import yt_dlp
 from PIL import Image
 import cloudscraper
 
@@ -23,11 +24,11 @@ class VideoListing:
         self.thumbnail_data = None
         self.runtime = None
         self.file_path = None
-        self.video_file_name = None
         self.is_downloaded = downloaded
         self.info = yt_search.get_video_info_from_id(id)
 
         self.fill_info()
+        self.video_file_name = clean_title(self.title)
 
     def __str__(self):
         return self.title
@@ -104,8 +105,7 @@ class VideoListing:
         :param download_folder: The folder which the video should be downloaded to
         """
         self.file_path = download_folder
-        yt_download.download_video_listing(self, download_folder)
-        self.video_file_name = yt_download.get_video_file_name(self, download_folder)
+        download_video_listing(self, download_folder)
         self.is_downloaded = True
         # self.video_file_name = self.title + '.mp4'
 
@@ -113,7 +113,7 @@ class VideoListing:
         """
         Uses os.startfile to play the video with the system's default video player
         """
-        raw_path = os.path.join(self.file_path , self.video_file_name)
+        raw_path = os.path.join(self.file_path , self.video_file_name + '.mp4')
         path = os.path.normpath(raw_path)
         print("Download Path:", path)
         try:
@@ -129,10 +129,36 @@ class VideoListing:
         """
         Uses os.remove to delete the video from the filesystem
         """
-        raw_path = os.path.join(self.file_path, self.video_file_name)
+        raw_path = os.path.join(self.file_path, self.video_file_name + '.mp4')
         path = os.path.normpath(raw_path)
         print("Video Deleted:", path)
         try:
             os.remove(path)
         except OSError as e:
             print(f"Error deleting video: {e}")
+
+def download_video_listing(self, path: str):
+    # not allowed windows symbols: \/:*?"<>|
+    video_ext: str = '/' + self.video_file_name + '.%(ext)s'
+    # p = ''.join((path, video_ext))
+
+    p = str(path) + video_ext
+    ydl_opts = {
+        'outtmpl': p,
+        'windowsfilenames': True
+        # 'restrictfilenames': True
+    }
+    # follows the options set
+    with yt_dlp.YoutubeDL(ydl_opts) as ydl:
+        ydl.download('www.youtube.com/watch?v=' + self.id)
+
+
+def clean_title(raw_title: str):
+    # \/:*?"<>|
+    invalid_chars = ['\\','/', ':', '*', '?', '<', '>', '|']
+    new_string = ''
+    for char in raw_title:
+        if char not in invalid_chars:
+            new_string += char
+
+    return new_string

@@ -2,7 +2,8 @@ import yt_dlp
 
 
 def download_video_listing(video, path: str):
-    # r'\/:*?"<>|'
+    # not allowed windows symbols: \/:*?"<>|
+    print(video.title)
     video_ext: str = '/%(title)s.%(ext)s'
     # p = ''.join((path, video_ext))
 
@@ -12,6 +13,7 @@ def download_video_listing(video, path: str):
         'windowsfilenames': True
         # 'restrictfilenames': True
     }
+    # follows the options set
     with yt_dlp.YoutubeDL(ydl_opts) as ydl:
         ydl.download('www.youtube.com/watch?v=' + video.id)
 
@@ -23,6 +25,7 @@ def get_video_file_name(video, path: str):
         'outtmpl': p,
         'windowsfilenames': True
     }
+    # does not follow the options set
     with yt_dlp.YoutubeDL(ydl_opts) as ydl:
         meta = ydl.extract_info('https://www.youtube.com/watch?v=' + video.id, download=False)
         video_file_name = "{0}.{1}".format((meta['title']), 'mp4')

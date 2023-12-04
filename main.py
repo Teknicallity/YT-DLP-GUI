@@ -2,7 +2,6 @@ import os.path
 
 import PySimpleGUI as sg
 from video_listing import VideoListing
-import yt_download
 from os import getcwd
 
 if __name__ == '__main__':
@@ -93,7 +92,7 @@ if __name__ == '__main__':
 
     while True:
         event, values = window.read()
-        print(event, values)
+        # print(event, values)
         if event == sg.WIN_CLOSED:
             break
 
