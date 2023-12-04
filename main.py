@@ -83,8 +83,9 @@ if __name__ == '__main__':
         global download_path
         if values['-FOLDER-'] == '':
             cwd = getcwd()
-            print(cwd)
-            download_path = os.path.join(cwd, 'videos')
+            print("CWD", cwd)
+            raw_download_path = os.path.join(cwd, 'videos')
+            download_path = os.path.normpath(raw_download_path)
         else:
             download_path = values['-FOLDER-']
             print(download_path)
@@ -160,6 +161,7 @@ if __name__ == '__main__':
             entry.play_video()
 
         elif event == '-DOWNLOAD_DELETE-' and downloaded_video_entries and is_something_downloaded_selected:
+            entry.delete_video()
             downloaded_video_entries.remove(entry)
             window['-DOWNLOAD_THUMBNAIL_IMAGE-'].update('', size=(640, 360))
 
