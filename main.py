@@ -1,6 +1,8 @@
+import os.path
+
 import PySimpleGUI as sg
 from video_listing import VideoListing
-import yt_download
+from os import getcwd
 
 if __name__ == '__main__':
 
@@ -15,7 +17,6 @@ if __name__ == '__main__':
         [sg.Text('Search:'), sg.In(key='-QUEUE_SEARCH_INPUT-', enable_events=True)],
         [sg.Frame('', [
 
-            # [sg.Listbox(queued_video_entries, key='-QUEUED_VIDEOS-', size=(25, 25), pad=(0, 0))]], pad=(5, 0)),
             [sg.Listbox(queued_video_entries, size=(30, 30), key='-QUEUE_LISTBOX-',
                         select_mode=sg.LISTBOX_SELECT_MODE_SINGLE, enable_events=True),
              sg.Column([
@@ -31,8 +32,8 @@ if __name__ == '__main__':
         [sg.Text('Youtube URL:', pad=((5, 0), 3)),
          sg.Input(key='-URL_INPUT-', size=(35, 1), pad=(0, 3), do_not_clear=False),
          sg.Button(button_text='Add', key='-YT_URL_ADD-', bind_return_key=True, pad=((5, 20), 0)),
-         sg.Text('Save to:', pad=((5, 0), 3)), sg.Input(size=(35, 1), key='-FOLDER-', pad=(0, 3)),
-         sg.FolderBrowse('Browse')],
+         sg.Text('Save to:', pad=((5, 0), 3)), sg.Input(size=(35, 1), key='-FOLDER-', enable_events=True, pad=(0, 3)),
+         sg.FolderBrowse('Browse', target='-FOLDER-', initial_folder='./videos')],
         [sg.Text('', size=(35, 1), key='-RESPONSE_TO_URL_INPUT-'), sg.Push(),
          sg.Button(button_text='Download All', key='-DOWNLOAD_ALL-')],
         [sg.Button(button_text='test1'), sg.Button(button_text='test2'), sg.Button(button_text='test3')]  # remove tests
@@ -49,7 +50,8 @@ if __name__ == '__main__':
                  [sg.Frame('',
                            [[sg.Image('', key='-DOWNLOAD_THUMBNAIL_IMAGE-', size=(640, 360), pad=(0, 0))]],
                            pad=(5, 5), size=(640, 360))],
-                 [sg.Button(button_text='Play'), sg.Button(button_text='Delete', key='-DOWNLOAD_DELETE-')]
+                 [sg.Button(button_text='Play', key='-PLAY_VIDEO-'),
+                  sg.Button(button_text='Delete', key='-DOWNLOAD_DELETE-')]
              ], element_justification='c')]
 
         ], pad=(5, 0))],
@@ -71,14 +73,29 @@ if __name__ == '__main__':
     is_something_downloaded_selected = False
 
     download_wait_message = "Downloading\nPlease Wait"
-    auto_close_time = 2
+    auto_close_time = 1.5
+    download_path = ''
+
+
+    def update_download_path():
+        global download_path
+        if values['-FOLDER-'] == '':
+            cwd = getcwd()
+            print("CWD", cwd)
+            raw_download_path = os.path.join(cwd, 'videos')
+            download_path = os.path.normpath(raw_download_path)
+        else:
+            download_path = values['-FOLDER-']
+            print(download_path)
+
 
     while True:
         event, values = window.read()
-        print(event, values)
+        # print(event, values)
         if event == sg.WIN_CLOSED:
             break
 
+        # add video from url button
         if event == '-YT_URL_ADD-' and values['-URL_INPUT-'] != '':
             url_input: str = values['-URL_INPUT-']
             base_youtube_url = 'youtube.com/watch?v='
@@ -96,34 +113,41 @@ if __name__ == '__main__':
 
         # queue listbox selection
         elif event == '-QUEUE_LISTBOX-':
-            selection = values['-QUEUE_LISTBOX-']
-            # print(selection)  # video object
+            selection = values['-QUEUE_LISTBOX-']  # get selection
             if selection:  # makes sure the selection is not empty
                 is_something_queued_selected = True
                 entry: VideoListing = selection[0]
                 # print(f'this: {entry}')  # video object to string
                 window['-QUEUE_THUMBNAIL_IMAGE-'].update(entry.thumbnail_data)
 
+        # delete queued video given something exists and is selected
         elif event == '-QUEUE_DELETE-' and queued_video_entries and is_something_queued_selected:
             queued_video_entries.remove(entry)
             window['-QUEUE_THUMBNAIL_IMAGE-'].update('', size=(640, 360))
 
+        # downloads queued video given something exists and is selected
         elif event == '-DOWNLOAD-' and queued_video_entries and is_something_queued_selected:
+            update_download_path()
             downloaded_video_entries.append(entry)
             queued_video_entries.remove(entry)
+            # self-closing download indicated
             sg.popup_timed(download_wait_message, auto_close_duration=auto_close_time, non_blocking=True)
             window['-QUEUE_THUMBNAIL_IMAGE-'].update('', size=(640, 360))
-            entry.download()
+            entry.download_to(download_path)
 
+        # downloads queued video given something exists
         elif event == '-DOWNLOAD_ALL-' and queued_video_entries:
             print('Starting Download All')
+            update_download_path()
             temp_queued_list = queued_video_entries.copy()
-            sg.popup_timed(download_wait_message, auto_close_duration=auto_close_time*len(queued_video_entries), non_blocking=True)
+            # self-closing download indicated
+            sg.popup_timed(download_wait_message, auto_close_duration=auto_close_time * len(queued_video_entries),
+                           non_blocking=True)
             for video in temp_queued_list:
                 downloaded_video_entries.append(video)
                 window['-QUEUE_THUMBNAIL_IMAGE-'].update('', size=(640, 360))
                 queued_video_entries.remove(video)
-                video.download()
+                video.download_to(download_path)
             # close sg.popup
 
         # download listbox selection
@@ -136,7 +160,13 @@ if __name__ == '__main__':
                 # print(f'this: {entry}')  # video object to string
                 window['-DOWNLOAD_THUMBNAIL_IMAGE-'].update(entry.thumbnail_data)
 
+        # play downloaded video given something exists and is selected
+        elif event == '-PLAY_VIDEO-' and downloaded_video_entries and is_something_downloaded_selected:
+            entry.play_video()
+
+        # delete downloaded video given something exists and is selected
         elif event == '-DOWNLOAD_DELETE-' and downloaded_video_entries and is_something_downloaded_selected:
+            entry.delete_video()
             downloaded_video_entries.remove(entry)
             window['-DOWNLOAD_THUMBNAIL_IMAGE-'].update('', size=(640, 360))
 
@@ -168,5 +198,3 @@ if __name__ == '__main__':
             window['-DOWNLOAD_LISTBOX-'].update(downloaded_video_entries)
 
     window.close()
-
-

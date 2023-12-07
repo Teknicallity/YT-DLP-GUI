@@ -16,8 +16,8 @@ search_response = youtube.search().list(
 '''
 
 
-def get_video_info_from_id(video_id) -> dict:
-    """
+def get_video_info_from_id(video_id) -> dict | None:
+    """Grabs the video information from the Youtube API
 
     :param video_id: end of the full youtube url
     :return: dictionary of the video info
