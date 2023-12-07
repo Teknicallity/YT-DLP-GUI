@@ -1,10 +1,3 @@
-"""
-Copyright (c) 2023, Joshua Sheputa
-All rights reserved.
-
-This source code is licensed under the BSD-style license found in the
-LICENSE file in the root directory of this source tree.
-"""
 import io
 import os
 import sys
@@ -13,6 +6,7 @@ import subprocess
 import yt_dlp
 from PIL import Image
 import cloudscraper
+
 import yt_search
 
 
