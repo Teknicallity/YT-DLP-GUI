@@ -7,6 +7,8 @@ This project is a GUI application built using PySimpleGUI that allows users to d
 - [Installation](#installation)
 - [Usage](#usage)
 - [Features](#features)
+- [Limitations](#limitations)
+- [Screenshots](#screenshots)
 
 ## Installation
 1. Make sure you have Python 3
@@ -22,8 +24,22 @@ Download all videos in the queue by clicking the "Download All" button.
 Play or delete downloaded videos in the "Downloaded" tab.
 
 ## Features
-Queue Management: Add, download, and delete videos from the download queue.
-Download All: Download all videos in the queue with a single click.
-Play and Delete: Play and delete downloaded videos.
-Thumbnail Display: Thumbnails of selected videos are displayed.
-Search Functionality: Search through the queue and downloaded videos.
+- Queue Management: Add, download, and delete videos from the download queue.
+- Download All: Download all videos in the queue with a single click.
+- Play and Delete: Play a video with the system's default video player or delete video file.
+- Thumbnail Display: Thumbnails of selected videos are displayed.
+- Search Functionality: Search through the queue and downloaded videos.
+
+## Limitations
+- No current database functionality, meaning no session-to-session saved videos. Video files remain on the disk
+
+## Screenshots
+### Queue Tab
+![Main Queue Tab](/assets/screenshots/queue_tab.png)
+
+*Caption: The primary tab, which functions as a queue for added videos before download*
+
+### Download Tab
+![Download Tab](/assets/screenshots/download_tab.png)
+
+*Caption: The downloaded videos tab where you can play or delete a downloaded video*
